@@ -1,10 +1,10 @@
 name: gg_repo_manager
-description: A starting point for Dart libraries or applications.
+description: Repository manages all of our repos, i.e. updating, maintaining, establishing coding rules, configuring projects.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/inlavigo/gg_repo_manager
 
 environment:
-  sdk: ^3.4.0-80.0.dev
+  sdk: ^3.2.0
 
 # Add regular dependencies here.
 dependencies:

@@ -4,5 +4,3 @@
 library;
 
 export 'src/gg_repo_manager_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
