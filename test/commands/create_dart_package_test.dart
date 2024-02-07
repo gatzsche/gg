@@ -8,6 +8,8 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:aud/src/commands/create_dart_package.dart';
+import 'package:aud/src/licenses/open_source_licence.dart';
+import 'package:aud/src/licenses/private_license.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -41,7 +43,7 @@ void main() {
           '-o',
           'some unknown directory',
           '-n',
-          'test_package',
+          'aud_test',
         ]),
         throwsA(
           isA<Exception>().having(
@@ -56,7 +58,7 @@ void main() {
     // #########################################################################
     test('should throw when the package directory already exists', () {
       // Create a temporary directory
-      final tempPackageDir = Directory(join(tempDir.path, 'test_package'));
+      final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
 
       // delete the package directory
       if (tempPackageDir.existsSync()) {
@@ -73,13 +75,13 @@ void main() {
           '-o',
           tempDir.path,
           '-n',
-          'test_package',
+          'aud_test',
         ]),
         throwsA(
           isA<Exception>().having(
             (e) => e.toString(),
             'message',
-            'Exception: The directory "${tempDir.path}/test_package" already '
+            'Exception: The directory "${tempDir.path}/aud_test" already '
                 'exists.',
           ),
         ),
@@ -90,9 +92,57 @@ void main() {
     });
 
     // #########################################################################
-    test('should create a dart package with the right name', () async {
+    test(
+        'should throw when the package is not open source '
+        'and the name does not start with "aud_"', () {
+      // Expect throws exception
+      expect(
+        r.run([
+          'createDartPackage',
+          '-o',
+          tempDir.path,
+          '-n',
+          'xyz_test',
+          '--no-open-source',
+        ]),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            'Exception: Non open source packages should start with "aud_"',
+          ),
+        ),
+      );
+    });
+
+    // #########################################################################
+    test(
+        'should throw when the package is open source '
+        'and the name does not start with "gg_"', () {
+      // Expect throws exception
+      expect(
+        r.run([
+          'createDartPackage',
+          '-o',
+          tempDir.path,
+          '-n',
+          'xyz_test',
+          '--open-source',
+        ]),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            'Exception: Open source packages should start with "gg_"',
+          ),
+        ),
+      );
+    });
+
+    // #########################################################################
+    test('should create a private dart package', () async {
       // Create a temporary directory
-      final tempPackageDir = Directory(join(tempDir.path, 'test_package'));
+      final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
 
       // delete the package directory
       if (tempPackageDir.existsSync()) {
@@ -105,11 +155,113 @@ void main() {
         '-o',
         tempDir.path,
         '-n',
-        'test_package',
+        'aud_test',
       ]);
 
       // The package should exist
       expect(tempPackageDir.existsSync(), true);
+
+      // The package should contain a lib directory
+      expect(Directory(join(tempPackageDir.path, 'lib')).existsSync(), true);
+
+      // The package should contain a test directory
+      expect(Directory(join(tempPackageDir.path, 'test')).existsSync(), true);
+
+      // The package should contain a pubspec.yaml file
+      expect(
+        File(join(tempPackageDir.path, 'pubspec.yaml')).existsSync(),
+        true,
+      );
+
+      // The package should contain a .gitignore file
+      expect(File(join(tempPackageDir.path, '.gitignore')).existsSync(), true);
+
+      // The package should contain a .vscode directory
+      expect(
+        Directory(join(tempPackageDir.path, '.vscode')).existsSync(),
+        true,
+      );
+
+      // .....................................................
+      // The package should contain a .vscode/launch.json file
+      expect(
+        File(join(tempPackageDir.path, '.vscode', 'launch.json')).existsSync(),
+        true,
+      );
+
+      // The package should contain a .vscode/settings.json file
+      expect(
+        File(join(tempPackageDir.path, '.vscode', 'settings.json'))
+            .existsSync(),
+        true,
+      );
+
+      // The package should contain a .vscode/tasks.json file
+      expect(
+        File(join(tempPackageDir.path, '.vscode', 'tasks.json')).existsSync(),
+        true,
+      );
+
+      // The package should contain a .vscode/extensions.json file
+      expect(
+        File(join(tempPackageDir.path, '.vscode', 'extensions.json'))
+            .existsSync(),
+        true,
+      );
+
+      // .......................................................
+      // The package should contain a analysis_options.yaml file
+      expect(
+        File(join(tempPackageDir.path, 'analysis_options.yaml')).existsSync(),
+        true,
+      );
+
+      // ............................................
+      // The package should contain a .gitignore file
+      expect(File(join(tempPackageDir.path, '.gitignore')).existsSync(), true);
+
+      // .............................................
+      // The package should contain a private LICENSE file
+      // because it is not open source
+      expect(
+        File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
+        privateLicence,
+      );
+
+      // Delete the temporary directory
+      tempPackageDir.deleteSync(recursive: true);
+    });
+
+    // #########################################################################
+    test('should create open source dart package', () async {
+      // Create a temporary directory
+      final tempPackageDir = Directory(join(tempDir.path, 'gg_test'));
+
+      // delete the package directory
+      if (tempPackageDir.existsSync()) {
+        tempPackageDir.deleteSync(recursive: true);
+      }
+
+      // Expect does not throw exception
+      await r.run([
+        'createDartPackage',
+        '-o',
+        tempDir.path,
+        '-n',
+        'gg_test',
+        '--open-source',
+      ]);
+
+      // The package should exist
+      expect(tempPackageDir.existsSync(), true);
+
+      // .............................................
+      // The package should contain an open source LICENSE file
+      // because it is not open source
+      expect(
+        File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
+        openSourceLicense,
+      );
 
       // Delete the temporary directory
       tempPackageDir.deleteSync(recursive: true);

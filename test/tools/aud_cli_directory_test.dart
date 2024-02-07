@@ -11,6 +11,12 @@ import 'package:test/test.dart';
 
 void main() {
   group('getProjectDir', () {
+    final oldCurrentDir = Directory.current;
+
+    tearDown(() {
+      Directory.current = oldCurrentDir;
+    });
+
     // #########################################################################
 
     group('should return the current project directory', () {

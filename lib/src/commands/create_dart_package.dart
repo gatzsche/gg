@@ -7,6 +7,9 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:aud/src/licenses/open_source_licence.dart';
+import 'package:aud/src/licenses/private_license.dart';
+import 'package:aud/tools.dart';
 import 'package:path/path.dart';
 
 /// Creates a new package in the given directory.
@@ -38,6 +41,14 @@ class CreateDartPackage extends Command<dynamic> {
       help: 'Package name',
       mandatory: true,
     );
+
+    // Add the isOpenSource option
+    argParser.addFlag(
+      'open-source',
+      abbr: 's',
+      help: 'Is the package open source?',
+      negatable: true,
+    );
   }
   // ...........................................................................
   /// The log function
@@ -53,6 +64,7 @@ class CreateDartPackage extends Command<dynamic> {
     var homeDirectory = Platform.environment['HOME'] ??
         Platform.environment['USERPROFILE'] ?? // coverage:ignore-line
         ''; // coverage:ignore-line
+    final isOpenSource = argResults?['open-source'] as bool;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -61,6 +73,7 @@ class CreateDartPackage extends Command<dynamic> {
       packageDir: join(updatedOutputDir, packageName),
       packageName: packageName,
       log: log,
+      isOpenSource: isOpenSource,
     ).run();
   }
 }
@@ -72,23 +85,26 @@ class _CreateDartPackage {
     required this.packageDir,
     required this.packageName,
     required this.log,
+    required this.isOpenSource,
   });
 
   final String outputDir;
   final String packageDir;
   final String packageName;
   final void Function(String message)? log;
+  final bool isOpenSource;
 
   // ...........................................................................
   Future<void> run() async {
-    _check();
+    _checkDirectories();
+    _checkPackageName();
     await _createPackage();
+    _copyVsCodeSettings();
+    _copyOverGitIgnore();
+    _copyOverAnalysisOptions();
+    _copyOverLicense();
 
-    // Copy over VScode settings
-    // Copy over .gitignore
-    // Copy over analysis options
     // Setup checks
-    // Copy LICENSE
     // Add GitHub Pipeline
     // Replace URL in pubspec.yaml
     // Init README.md
@@ -101,7 +117,7 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _check() {
+  void _checkDirectories() {
     // Target dir exists?
     if (!Directory(outputDir).existsSync()) {
       throw Exception('The directory "$outputDir" does not exist.');
@@ -111,6 +127,17 @@ class _CreateDartPackage {
     final packageDir = join(outputDir, packageName);
     if (Directory(packageDir).existsSync()) {
       throw Exception('The directory "$packageDir" already exists.');
+    }
+  }
+
+  // ...........................................................................
+  void _checkPackageName() {
+    if (isOpenSource && !packageName.startsWith('gg_')) {
+      throw Exception('Open source packages should start with "gg_"');
+    }
+
+    if (!isOpenSource && !packageName.startsWith('aud_')) {
+      throw Exception('Non open source packages should start with "aud_"');
     }
   }
 
@@ -136,8 +163,53 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  Future<void> _copyVsCodeSettings() async {
+  void _copyVsCodeSettings() {
     // Copy over VScode which are located in project/.vscode
-    final vscodeDir = join(packageDir, '.vscode');
+    final vscodeDir = join(audCliDirectory(), '.vscode');
+    final targetVscodeDir = join(packageDir, '.vscode');
+    _copyDirectory(vscodeDir, targetVscodeDir);
+  }
+
+  // ...........................................................................
+  void _copyDirectory(String source, String target) {
+    Directory(target).createSync(recursive: true);
+    final content = Directory(source).listSync(recursive: true);
+    for (var entity in content) {
+      if (entity is Directory) {
+        Directory(join(target, basename(entity.path))) // coverage:ignore-line
+            .createSync(recursive: true); // coverage:ignore-line
+      } else if (entity is File) {
+        entity.copySync(join(target, basename(entity.path)));
+      }
+    }
+  }
+
+  // ...........................................................................
+  void _copyFile(String source, String target) {
+    File(source).copySync(target);
+  }
+
+  // ...........................................................................
+  void _copyOverGitIgnore() {
+    _copyFile(
+      join(audCliDirectory(), '.gitignore'),
+      join(packageDir, '.gitignore'),
+    );
+  }
+
+  // ...........................................................................
+  void _copyOverAnalysisOptions() {
+    _copyFile(
+      join(audCliDirectory(), 'analysis_options.yaml'),
+      join(packageDir, 'analysis_options.yaml'),
+    );
+  }
+
+  // ...........................................................................
+  void _copyOverLicense() {
+    final license = (isOpenSource ? openSourceLicense : privateLicence)
+        .replaceAll('YEAR', DateTime.now().year.toString());
+
+    File(join(packageDir, 'LICENSE')).writeAsStringSync(license);
   }
 }
