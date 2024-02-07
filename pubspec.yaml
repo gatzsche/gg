@@ -1,14 +1,13 @@
-name: gg_repo_manager
-description: Repository manages all of our repos, i.e. updating, maintaining, establishing coding rules, configuring projects.
+name: aud_cli
+description: Manages many things around audanika software development.
 version: 1.0.0
-repository: https://github.com/inlavigo/gg_repo_manager
+repository: https://github.com/inlavigo/aud_cli
 
 environment:
   sdk: ^3.2.0
 
-# Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  path: ^1.8.0
 
 dev_dependencies:
   args: ^2.4.2
