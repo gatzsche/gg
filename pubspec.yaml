@@ -1,11 +1,12 @@
-name: aud_cli
-description: Manages many things around audanika software development.
+name: aud
+description: The audanika developer command line
 version: 1.0.0
-repository: https://github.com/inlavigo/aud_cli
+repository: https://github.com/inlavigo/aud
 
 environment:
   sdk: ^3.2.0
 
+# Add regular dependencies here.
 dependencies:
   path: ^1.8.0
   args: ^2.4.2

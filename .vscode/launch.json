@@ -6,6 +6,13 @@
 
   "configurations": [
     {
+      "name": "Run aud",
+      "type": "dart",
+      "request": "launch",
+      "program": "bin/main.dart",
+      "args": ["createDartPackage"]
+    },
+    {
       "name": "Test Current File",
       "type": "dart",
       "request": "launch",

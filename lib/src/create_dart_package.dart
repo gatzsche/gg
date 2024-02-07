@@ -7,7 +7,7 @@
 import 'package:args/command_runner.dart';
 
 /// Creates a new package in the given directory.
-class CreatePackage extends Command<dynamic> {
+class CreateDartPackage extends Command<dynamic> {
   /// The name of the package
   @override
   final name = 'createDartPackage';
@@ -17,7 +17,7 @@ class CreatePackage extends Command<dynamic> {
   final description = 'Creates a new dart package for our repository';
 
   /// Constructor
-  CreatePackage() {
+  CreateDartPackage() {
     // we can add command specific arguments here.
     // [argParser] is automatically created by the parent class.
     argParser.addFlag('all', abbr: 'a');

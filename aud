@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(dirname "$0")
+dart run $SCRIPT_DIR/bin/main.dart $0
