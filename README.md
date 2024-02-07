@@ -1,3 +1,3 @@
-# GgRepoManager
+# AudCli
 
-Repository manages all of our repos, i.e. updating, maintaining, establishing coding rules, configuring projects.
+Our CLI to manage our repos as well many things around software development
