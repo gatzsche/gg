@@ -4,7 +4,10 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
+import 'package:path/path.dart';
 
 /// Creates a new package in the given directory.
 class CreateDartPackage extends Command<dynamic> {
@@ -17,7 +20,9 @@ class CreateDartPackage extends Command<dynamic> {
   final description = 'Creates a new dart package for our repository';
 
   /// Constructor
-  CreateDartPackage() {
+  CreateDartPackage({
+    this.log,
+  }) {
     // Add the output option
     argParser.addOption(
       'output',
@@ -25,13 +30,93 @@ class CreateDartPackage extends Command<dynamic> {
       help: 'Output directory',
       defaultsTo: '.',
     );
-  }
 
+    // Add the package name option
+    argParser.addOption(
+      'name',
+      abbr: 'n',
+      help: 'Package name',
+      mandatory: true,
+    );
+  }
+  // ...........................................................................
+  /// The log function
+  final void Function(String message)? log;
+
+  // ...........................................................................
   /// Runs the command
   @override
-  void run() {
-    // [argResults] is set before [run()] is called and contains the flags/options
-    // passed to this command.
-    print(argResults?['output']);
+  void run() async {
+    // Get the output directory
+    final outputDir = (argResults?['output'] as String).trim();
+    final packageName = (argResults?['name'] as String).trim();
+    var homeDirectory = Platform.environment['HOME'] ??
+        Platform.environment['USERPROFILE'] ?? // coverage:ignore-line
+        ''; // coverage:ignore-line
+
+    final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
+
+    await _CreateDartPackage(
+      outputDir: updatedOutputDir,
+      packageDir: join(updatedOutputDir, packageName),
+      packageName: packageName,
+      log: log,
+    ).run();
+  }
+}
+
+// #############################################################################
+class _CreateDartPackage {
+  _CreateDartPackage({
+    required this.outputDir,
+    required this.packageDir,
+    required this.packageName,
+    required this.log,
+  });
+
+  final String outputDir;
+  final String packageDir;
+  final String packageName;
+  final void Function(String message)? log;
+
+  // ...........................................................................
+  Future<void> run() async {
+    _check();
+    await _createPackage();
+  }
+
+  // ...........................................................................
+  void _check() {
+    // Target dir exists?
+    if (!Directory(outputDir).existsSync()) {
+      throw Exception('The directory "$outputDir" does not exist.');
+    }
+
+    // Package already exists?
+    final packageDir = join(outputDir, packageName);
+    if (Directory(packageDir).existsSync()) {
+      throw Exception('The directory "$packageDir" already exists.');
+    }
+  }
+
+  // ...........................................................................
+  Future<void> _createPackage() async {
+    // .......................
+    // Create the dart package
+    // Step 2: Create a new Dart package named `aud`
+    final result = await Process.run(
+      'dart',
+      ['create', '-t', 'package', packageName, '--no-pub'],
+      workingDirectory: outputDir,
+    );
+
+    // Log result
+    if (result.stderr != null && (result.stderr as String).isNotEmpty) {
+      log?.call(result.stderr as String); // coverage:ignore-line
+    }
+
+    if (result.stdout != null && (result.stdout as String).isNotEmpty) {
+      log?.call(result.stdout as String);
+    }
   }
 }

@@ -9,8 +9,8 @@
       "name": "Run aud",
       "type": "dart",
       "request": "launch",
-      "program": "bin/main.dart",
-      "args": ["createDartPackage"]
+      "program": "bin/aud",
+      "args": ["createDartPackage", "-o ~/tmp", "-n aud_ab_space_colors"]
     },
     {
       "name": "Test Current File",
