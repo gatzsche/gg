@@ -83,6 +83,21 @@ class _CreateDartPackage {
   Future<void> run() async {
     _check();
     await _createPackage();
+
+    // Copy over VScode settings
+    // Copy over .gitignore
+    // Copy over analysis options
+    // Setup checks
+    // Copy LICENSE
+    // Add GitHub Pipeline
+    // Replace URL in pubspec.yaml
+    // Init README.md
+    // Init CHANGELog.md
+    // Fix all errors and warnings
+    // Add missing comments
+    // Init git
+    // Connect the project to GitHub
+    // Push the changes to GitHub
   }
 
   // ...........................................................................
@@ -118,5 +133,11 @@ class _CreateDartPackage {
     if (result.stdout != null && (result.stdout as String).isNotEmpty) {
       log?.call(result.stdout as String);
     }
+  }
+
+  // ...........................................................................
+  Future<void> _copyVsCodeSettings() async {
+    // Copy over VScode which are located in project/.vscode
+    final vscodeDir = join(packageDir, '.vscode');
   }
 }
