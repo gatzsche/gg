@@ -69,6 +69,15 @@ class CreateDartPackage extends Command<dynamic> {
       negatable: true,
       defaultsTo: true,
     );
+
+    // Force recreation
+    argParser.addFlag(
+      'force',
+      abbr: 'f',
+      help: 'Force recreation. Existing package will be deleted.',
+      negatable: true,
+      defaultsTo: false,
+    );
   }
   // ...........................................................................
   /// The log function
@@ -88,6 +97,7 @@ class CreateDartPackage extends Command<dynamic> {
         ''; // coverage:ignore-line
     final isOpenSource = argResults?['open-source'] as bool;
     final pushToGitHub = argResults?['prepare-github'] as bool;
+    final force = argResults?['force'] as bool;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -99,6 +109,7 @@ class CreateDartPackage extends Command<dynamic> {
       log: log ?? (msg) {},
       isOpenSource: isOpenSource,
       prepareGitHub: pushToGitHub,
+      force: force,
     ).run();
   }
 }
@@ -113,6 +124,7 @@ class _CreateDartPackage {
     required this.log,
     required this.isOpenSource,
     required this.prepareGitHub,
+    required this.force,
   });
 
   final String outputDir;
@@ -122,12 +134,14 @@ class _CreateDartPackage {
   final void Function(String message) log;
   final bool isOpenSource;
   final bool prepareGitHub;
+  final bool force;
   static const gitHubRepo = 'https://github.com/inlavigo';
 
   // ...........................................................................
   Future<void> run() async {
     log('\nCreate dart package...\n');
 
+    _deleteExistingPackage();
     _checkDirectories();
     _checkPackageName();
     _checkDescription();
@@ -146,6 +160,17 @@ class _CreateDartPackage {
     _prepareBaseDart();
     _fixErrorsAndWarnings();
     _initGit();
+  }
+
+  // ...........................................................................
+  void _deleteExistingPackage() {
+    if (!force) return;
+
+    log('Delete existing package...');
+    final packageDir = join(outputDir, packageName);
+    if (Directory(packageDir).existsSync()) {
+      Directory(packageDir).deleteSync(recursive: true);
+    }
   }
 
   // ...........................................................................
@@ -442,6 +467,29 @@ class _CreateDartPackage {
         '${result2.stdout}\n'
         'Please adapt "create_dart_package.dart" to fix the issues.',
       );
+      // coverage:ignore-end
+    }
+    // Format code
+    final result3 = Process.runSync('dart', [
+      'format',
+      packageDir,
+    ]);
+
+    if (result3.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception('Error while running dart format. ${result3.stdout}');
+      // coverage:ignore-end
+    }
+
+    // Check that no formatting is left
+    final result4 = Process.runSync(
+      'dart',
+      ['format', packageDir, '--set-exit-if-changed'],
+    );
+
+    if (result4.exitCode != 0) {
+      // coverage:ignore-start
+      throw Exception('Error while running dart format. ${result4.stdout}');
       // coverage:ignore-end
     }
   }

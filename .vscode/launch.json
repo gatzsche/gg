@@ -9,8 +9,16 @@
       "name": "Run aud",
       "type": "dart",
       "request": "launch",
-      "program": "bin/aud",
-      "args": ["createDartPackage", "-o ~/tmp", "-n aud_ab_space_colors"]
+      "program": "bin/aud.dart",
+      "args": [
+        "createDartPackage",
+        "-n",
+        "aud_test",
+        "-d",
+        "Manages colors of Audanika's AbSpace, i.e. key colors, chord type overlays etc",
+        "--force"
+      ],
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "Test Current File",
