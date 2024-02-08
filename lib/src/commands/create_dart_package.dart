@@ -100,12 +100,11 @@ class _CreateDartPackage {
     _checkPackageName();
     await _createPackage();
     _copyVsCodeSettings();
-    _copyOverGitIgnore();
-    _copyOverAnalysisOptions();
-    _copyOverLicense();
-    _copyOverChecks();
+    _copyGitIgnore();
+    _copyAnalysisOptions();
+    _copyLicense();
+    _copyChecks();
 
-    // Setup checks
     // Add GitHub Pipeline
     // Replace URL in pubspec.yaml
     // Init README.md
@@ -191,7 +190,7 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _copyOverGitIgnore() {
+  void _copyGitIgnore() {
     _copyFile(
       join(audCliDirectory(), '.gitignore'),
       join(packageDir, '.gitignore'),
@@ -199,7 +198,7 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _copyOverAnalysisOptions() {
+  void _copyAnalysisOptions() {
     _copyFile(
       join(audCliDirectory(), 'analysis_options.yaml'),
       join(packageDir, 'analysis_options.yaml'),
@@ -207,7 +206,7 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _copyOverLicense() {
+  void _copyLicense() {
     final license = (isOpenSource ? openSourceLicense : privateLicence)
         .replaceAll('YEAR', DateTime.now().year.toString());
 
@@ -215,7 +214,7 @@ class _CreateDartPackage {
   }
 
   // ...........................................................................
-  void _copyOverChecks() {
+  void _copyChecks() {
     // Get all files in the aud_cli directory starting with check
     final audCliDir = audCliDirectory();
     final files = Directory(join(audCliDir))
