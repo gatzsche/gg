@@ -33,7 +33,7 @@ class CreateDartPackage extends Command<dynamic> {
       'output',
       abbr: 'o',
       help: 'Output directory',
-      defaultsTo: '.',
+      defaultsTo: checkoutDirectory(),
     );
 
     // Add the package name option
@@ -487,22 +487,21 @@ class _CreateDartPackage {
     if (prepareGitHub) {
       final result6 = Process.runSync(
         'git',
-        ['remote', 'add', 'origin', '$gitHubRepo/$packageName.git'],
+        ['remote', 'add', 'origin', 'git@github.com:inlavigo/$packageName.git'],
         workingDirectory: packageDir,
       );
 
       if (result6.exitCode != 0) {
         // coverage:ignore-start
         throw Exception(
-          'Error while running git remote add origin $gitHubRepo/$packageName.git',
+          'Error while running "git@github.com:inlavigo/$packageName.git"',
         );
         // coverage:ignore-end
       }
 
       log?.call('Everything is prepared.');
-      log?.call(
-        'Please execute "git push -u origin main" to push to GitHub.',
-      );
+      log?.call('Please call "cd $packageDir" and \n');
+      log?.call('call "git push -u origin main" to push to GitHub.');
     }
   }
 }

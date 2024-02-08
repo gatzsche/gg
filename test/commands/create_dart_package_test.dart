@@ -16,7 +16,7 @@ import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final tempDir = Directory('/Users/gatzsche/tmp'); // Directory.systemTemp;
+  final tempDir = Directory.systemTemp; // Directory('/tmp');
   final logMessages = <String>[];
   const String description = 'This is a description of the package. '
       'It should be at least 60 characters long.';
@@ -337,7 +337,12 @@ void main() {
 
       expect(
         logMessages,
-        contains('Please execute "git push -u origin main" to push to GitHub.'),
+        contains('Please call "cd ${tempPackageDir.path}" and \n'),
+      );
+
+      expect(
+        logMessages,
+        contains('call "git push -u origin main" to push to GitHub.'),
       );
     });
 
