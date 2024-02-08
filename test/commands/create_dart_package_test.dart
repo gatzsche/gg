@@ -228,6 +228,11 @@ void main() {
         privateLicence,
       );
 
+      // .................................
+      // Package should contain the checks
+      expect(File(join(tempPackageDir.path, 'check')).existsSync(), true);
+
+      // ..............................
       // Delete the temporary directory
       tempPackageDir.deleteSync(recursive: true);
     });

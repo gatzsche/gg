@@ -103,6 +103,7 @@ class _CreateDartPackage {
     _copyOverGitIgnore();
     _copyOverAnalysisOptions();
     _copyOverLicense();
+    _copyOverChecks();
 
     // Setup checks
     // Add GitHub Pipeline
@@ -211,5 +212,28 @@ class _CreateDartPackage {
         .replaceAll('YEAR', DateTime.now().year.toString());
 
     File(join(packageDir, 'LICENSE')).writeAsStringSync(license);
+  }
+
+  // ...........................................................................
+  void _copyOverChecks() {
+    // Get all files in the aud_cli directory starting with check
+    final audCliDir = audCliDirectory();
+    final files = Directory(join(audCliDir))
+        .listSync()
+        .whereType<File>()
+        .map((e) => relative(e.path, from: audCliDir));
+
+    // Copy over file
+    final checkFiles = files
+        .where(
+          (item) => relative(item, from: audCliDirectory()).startsWith('check'),
+        )
+        .toList();
+
+    for (final file in checkFiles) {
+      final sourceFile = File(join(audCliDir, file));
+      final targetFile = join(packageDir, basename(file));
+      sourceFile.copySync(targetFile);
+    }
   }
 }
