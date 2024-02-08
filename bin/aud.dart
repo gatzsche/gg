@@ -15,7 +15,7 @@ Future<void> main(List<String> arguments) async {
     final r = CommandRunner<dynamic>(
       'aud',
       'Our cli to manage many tasks about audanika software development.',
-    )..addCommand(CreateDartPackage());
+    )..addCommand(CreateDartPackage(log: (msg) => print(msg) ));
 
     await r.run(arguments);
   } catch (e) {

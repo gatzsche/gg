@@ -62,11 +62,11 @@ class CreateDartPackage extends Command<dynamic> {
 
     // Add the push repo option
     argParser.addFlag(
-      'push',
+      'prepare-github',
       abbr: 'p',
-      help: 'Pushes the repository to GitHub at the end.',
+      help: 'Prepares pushing the repo to GitHub.',
       negatable: true,
-      defaultsTo: false,
+      defaultsTo: true,
     );
   }
   // ...........................................................................
@@ -86,7 +86,7 @@ class CreateDartPackage extends Command<dynamic> {
         Platform.environment['USERPROFILE'] ?? // coverage:ignore-line
         ''; // coverage:ignore-line
     final isOpenSource = argResults?['open-source'] as bool;
-    final pushToGitHub = argResults?['push'] as bool;
+    final pushToGitHub = argResults?['prepare-github'] as bool;
 
     final updatedOutputDir = outputDir.replaceAll('~', homeDirectory);
 
@@ -97,7 +97,7 @@ class CreateDartPackage extends Command<dynamic> {
       description: description,
       log: log,
       isOpenSource: isOpenSource,
-      pushToGitHub: pushToGitHub,
+      prepareGitHub: pushToGitHub,
     ).run();
   }
 }
@@ -111,7 +111,7 @@ class _CreateDartPackage {
     required this.description,
     required this.log,
     required this.isOpenSource,
-    required this.pushToGitHub,
+    required this.prepareGitHub,
   });
 
   final String outputDir;
@@ -120,7 +120,7 @@ class _CreateDartPackage {
   final String description;
   final void Function(String message)? log;
   final bool isOpenSource;
-  final bool pushToGitHub;
+  final bool prepareGitHub;
   static const gitHubRepo = 'https://github.com/inlavigo';
 
   // ...........................................................................
@@ -179,7 +179,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   Future<void> _checkGithubOrigin() async {
-    if (!pushToGitHub) return;
+    if (!prepareGitHub) return;
 
     final repo = 'git@github.com:inlavigo/$packageName.git';
 
@@ -189,6 +189,7 @@ class _CreateDartPackage {
       workingDirectory: outputDir,
     );
 
+    // coverage:ignore-start
     if (result.exitCode == 128) {
       throw Exception(
         'The github repository "$repo" does not exist. '
@@ -199,6 +200,7 @@ class _CreateDartPackage {
           'Exit code: ${result.exitCode}\n'
           'Error: ${result.stderr}\n');
     }
+    // coverage:ignore-end
   }
 
   // ...........................................................................
@@ -314,7 +316,9 @@ class _CreateDartPackage {
     // Check if the search string is in the file
     final pattern = RegExp(search, multiLine: true);
     if (!pattern.hasMatch(content)) {
+      // coverage:ignore-start
       throw Exception('Search string "$search" not found in file "$file"');
+      // coverage:ignore-end
     }
 
     final updatedContent = content.replaceAll(pattern, replace);
@@ -368,9 +372,11 @@ class _CreateDartPackage {
       workingDirectory: packageDir,
     );
     if (result.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception(
         'Error while running "dart pub add --dev args coverage pana yaml"',
       );
+      // coverage:ignore-end
     }
   }
 
@@ -390,7 +396,9 @@ class _CreateDartPackage {
     );
 
     if (result.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception('Error while running dart fix');
+      // coverage:ignore-end
     }
 
     // Execute dart analyze
@@ -399,12 +407,14 @@ class _CreateDartPackage {
       ['analyze', packageDir],
     );
     if (result2.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception(
         'Error while running dart analyze:\n'
         '${result2.stderr}\n'
         '${result2.stdout}\n'
         'Please adapt "create_dart_package.dart" to fix the issues.',
       );
+      // coverage:ignore-end
     }
   }
 
@@ -418,7 +428,7 @@ class _CreateDartPackage {
     );
 
     if (result.exitCode != 0) {
-      throw Exception('Error while running git init');
+      throw Exception('Error while running git init'); // coverage:ignore-line
     }
 
     // Execute git branch -M main
@@ -429,7 +439,9 @@ class _CreateDartPackage {
     );
 
     if (result2.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception('Error while running git branch -M main');
+      // coverage:ignore-end
     }
 
     // Execute git config advice.addIgnoredFile false
@@ -440,9 +452,11 @@ class _CreateDartPackage {
     );
 
     if (result3.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception(
         'Error while running git config advice.addIgnoredFile false',
       );
+      // coverage:ignore-end
     }
 
     // Execute git add *
@@ -453,7 +467,7 @@ class _CreateDartPackage {
     );
 
     if (result4.exitCode != 0) {
-      throw Exception('Error while running git add *');
+      throw Exception('Error while running git add *'); // coverage:ignore-line
     }
 
     // Execute git commit -m"Initial boylerplate"
@@ -464,11 +478,13 @@ class _CreateDartPackage {
     );
 
     if (result5.exitCode != 0) {
+      // coverage:ignore-start
       throw Exception('Error while running git commit -m"Initial boylerplate"');
+      // coverage:ignore-end
     }
 
     // Push repo to GitHub
-    if (pushToGitHub) {
+    if (prepareGitHub) {
       final result6 = Process.runSync(
         'git',
         ['remote', 'add', 'origin', '$gitHubRepo/$packageName.git'],
@@ -476,20 +492,17 @@ class _CreateDartPackage {
       );
 
       if (result6.exitCode != 0) {
+        // coverage:ignore-start
         throw Exception(
           'Error while running git remote add origin $gitHubRepo/$packageName.git',
         );
+        // coverage:ignore-end
       }
 
-      final result7 = Process.runSync(
-        'git',
-        ['push', '-u', 'origin', 'main'],
-        workingDirectory: packageDir,
+      log?.call('Everything is prepared.');
+      log?.call(
+        'Please execute "git push -u origin main" to push to GitHub.',
       );
-
-      if (result7.exitCode != 0) {
-        throw Exception('Error while running git push -u origin main');
-      }
     }
   }
 }

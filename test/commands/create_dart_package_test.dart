@@ -60,6 +60,7 @@ void main() {
           'aud_test',
           '-d',
           description,
+          '--no-prepare-github',
         ]),
         throwsA(
           isA<Exception>().having(
@@ -83,6 +84,7 @@ void main() {
           'aud_test',
           '-d',
           'This description is less then 60 chars.',
+          '--no-prepare-github',
         ]),
         throwsA(
           isA<Exception>().having(
@@ -112,6 +114,7 @@ void main() {
           'aud_test',
           '-d',
           description,
+          '--no-prepare-github',
         ]),
         throwsA(
           isA<Exception>().having(
@@ -138,6 +141,7 @@ void main() {
           'xyz_test',
           '--no-open-source',
           '-d',
+          '--no-prepare-github',
           description,
         ]),
         throwsA(
@@ -164,6 +168,7 @@ void main() {
           'xyz_test',
           '--open-source',
           '-d',
+          '--no-prepare-github',
           description,
         ]),
         throwsA(
@@ -190,6 +195,7 @@ void main() {
         'aud_test',
         '-d',
         description,
+        '--prepare-github',
       ]);
 
       // The package should exist
@@ -316,6 +322,23 @@ void main() {
               .readAsStringSync();
       expect(audTestBase, contains(fileHeader));
       expect(audTestBase, contains(baseDartSnippet));
+
+      // ...............
+      // Should init git
+      final gitDir = Directory(join(tempPackageDir.path, '.git'));
+      expect(gitDir.existsSync(), isTrue);
+
+      final result = Process.runSync(
+        'git',
+        ['status'],
+        workingDirectory: tempPackageDir.path,
+      );
+      expect(result.stdout, contains('nothing to commit, working tree clean'));
+
+      expect(
+        logMessages,
+        contains('Please execute "git push -u origin main" to push to GitHub.'),
+      );
     });
 
     // #########################################################################
@@ -333,6 +356,7 @@ void main() {
         '--open-source',
         '-d',
         description,
+        '--no-prepare-github',
       ]);
 
       // The package should exist
