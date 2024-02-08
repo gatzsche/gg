@@ -12,6 +12,7 @@ import 'package:aud/src/snippets/base_dart.dart';
 import 'package:aud/src/snippets/file_header.dart';
 import 'package:aud/src/snippets/open_source_licence.dart';
 import 'package:aud/src/snippets/private_license.dart';
+import 'package:aud/src/tools/color.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -337,12 +338,24 @@ void main() {
 
       expect(
         logMessages,
-        contains('Please call "cd ${tempPackageDir.path}" and \n'),
+        contains(
+          '\nSuccess! To open the project with visual studio code, call ',
+        ),
       );
 
       expect(
         logMessages,
-        contains('call "git push -u origin main" to push to GitHub.'),
+        contains('${greenStart}code ${tempPackageDir.path}$greenEnd\n'),
+      );
+
+      expect(
+        logMessages,
+        contains('To push the project to GitHub, call'),
+      );
+
+      expect(
+        logMessages,
+        contains('${greenStart}git push -u origin main$greenEnd\n'),
       );
     });
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env dart
-
 // @license
 // Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
 //
@@ -8,6 +7,7 @@
 
 import 'package:args/command_runner.dart';
 import 'package:aud/commands.dart';
+import 'package:aud/src/tools/color.dart';
 
 // #############################################################################
 Future<void> main(List<String> arguments) async {
@@ -15,10 +15,11 @@ Future<void> main(List<String> arguments) async {
     final r = CommandRunner<dynamic>(
       'aud',
       'Our cli to manage many tasks about audanika software development.',
-    )..addCommand(CreateDartPackage(log: (msg) => print(msg) ));
+    )..addCommand(CreateDartPackage(log: (msg) => print(msg)));
 
     await r.run(arguments);
   } catch (e) {
-    print(e);
+    final msg = e.toString().replaceAll('Exception: ', '');
+    print('$redStart$msg$redEnd');
   }
 }

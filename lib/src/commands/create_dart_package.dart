@@ -11,6 +11,7 @@ import 'package:aud/src/snippets/base_dart.dart';
 import 'package:aud/src/snippets/file_header.dart';
 import 'package:aud/src/snippets/open_source_licence.dart';
 import 'package:aud/src/snippets/private_license.dart';
+import 'package:aud/src/tools/color.dart';
 import 'package:aud/tools.dart';
 import 'package:path/path.dart';
 
@@ -95,7 +96,7 @@ class CreateDartPackage extends Command<dynamic> {
       packageDir: join(updatedOutputDir, packageName),
       packageName: packageName,
       description: description,
-      log: log,
+      log: log ?? (msg) {},
       isOpenSource: isOpenSource,
       prepareGitHub: pushToGitHub,
     ).run();
@@ -118,13 +119,15 @@ class _CreateDartPackage {
   final String packageDir;
   final String packageName;
   final String description;
-  final void Function(String message)? log;
+  final void Function(String message) log;
   final bool isOpenSource;
   final bool prepareGitHub;
   static const gitHubRepo = 'https://github.com/inlavigo';
 
   // ...........................................................................
   Future<void> run() async {
+    log('\nCreate dart package...\n');
+
     _checkDirectories();
     _checkPackageName();
     _checkDescription();
@@ -147,6 +150,8 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkDirectories() {
+    log('Check directories...');
+
     // Target dir exists?
     if (!Directory(outputDir).existsSync()) {
       throw Exception('The directory "$outputDir" does not exist.');
@@ -161,6 +166,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkPackageName() {
+    log('Check package names...');
     if (isOpenSource && !packageName.startsWith('gg_')) {
       throw Exception('Open source packages should start with "gg_"');
     }
@@ -172,6 +178,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _checkDescription() {
+    log('Check description ...');
     if (description.length < 60) {
       throw Exception('The description must be at least 60 characters long.');
     }
@@ -180,6 +187,8 @@ class _CreateDartPackage {
   // ...........................................................................
   Future<void> _checkGithubOrigin() async {
     if (!prepareGitHub) return;
+
+    log('Check GitHub origin...');
 
     final repo = 'git@github.com:inlavigo/$packageName.git';
 
@@ -205,9 +214,9 @@ class _CreateDartPackage {
 
   // ...........................................................................
   Future<void> _createPackage() async {
+    log('Create package...');
     // .......................
     // Create the dart package
-    // Step 2: Create a new Dart package named `aud`
     final result = await Process.run(
       'dart',
       ['create', '-t', 'package', packageName, '--no-pub'],
@@ -215,18 +224,26 @@ class _CreateDartPackage {
     );
 
     // Log result
-    if (result.stderr != null && (result.stderr as String).isNotEmpty) {
-      log?.call(result.stderr as String); // coverage:ignore-line
+    // coverage:ignore-start
+    if (result.exitCode != 0 &&
+        result.stderr != null &&
+        (result.stderr as String).isNotEmpty) {
+      log(result.stderr as String);
     }
 
-    if (result.stdout != null && (result.stdout as String).isNotEmpty) {
-      log?.call(result.stdout as String);
+    if (result.exitCode != 0 &&
+        result.stdout != null &&
+        (result.stdout as String).isNotEmpty) {
+      log(result.stdout as String);
     }
+    // coverage:ignore-end
   }
 
   // ...........................................................................
   void _copyVsCodeSettings() {
     // Copy over VScode which are located in project/.vscode
+    log('Copy VSCode settings...');
+
     final vscodeDir = join(audCliDirectory(), '.vscode');
     final targetVscodeDir = join(packageDir, '.vscode');
     _copyDirectory(vscodeDir, targetVscodeDir);
@@ -256,6 +273,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyGitIgnore() {
+    log('Copy .gitignore...');
     _copyFile(
       join(audCliDirectory(), '.gitignore'),
       join(packageDir, '.gitignore'),
@@ -264,6 +282,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyAnalysisOptions() {
+    log('Copy analysis_options.yaml...');
     _copyFile(
       join(audCliDirectory(), 'analysis_options.yaml'),
       join(packageDir, 'analysis_options.yaml'),
@@ -272,6 +291,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyLicense() {
+    log('Copy LICENSE...');
     final license = (isOpenSource ? openSourceLicense : privateLicence)
         .replaceAll('YEAR', DateTime.now().year.toString());
 
@@ -280,6 +300,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyChecks() {
+    log('Copy checks...');
     // Get all files in the aud_cli directory starting with check
     final audCliDir = audCliDirectory();
     final files = Directory(join(audCliDir))
@@ -303,6 +324,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _copyGitHubActions() {
+    log('Copy GitHub Actions...');
     // Copy over GitHub Actions
     final githubActionsDir = join(audCliDirectory(), '.github');
     final targetGitHubActionsDir = join(packageDir, '.github');
@@ -327,6 +349,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _preparePubspec() {
+    log('Prepare pubspec.yaml...');
     final pubspecFile = join(packageDir, 'pubspec.yaml');
 
     // Write repository into file
@@ -346,6 +369,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareReadme() {
+    log('Prepare README.md...');
     final readmeFile = join(packageDir, 'README.md');
     String content = '';
     content += '# $packageName\n\n';
@@ -355,6 +379,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareChangeLog() {
+    log('Prepare CHANGELOG.md...');
     final changeLogFile = File(join(packageDir, 'CHANGELOG.md'));
     String content = '';
     content += '# Change Log\n\n';
@@ -365,6 +390,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _installDependencies() {
+    log('Install dependencies...');
     // Execute "dart pub add --dev args coverage pana yaml"
     final result = Process.runSync(
       'dart',
@@ -382,6 +408,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _prepareBaseDart() {
+    log('Prepare base_dart.dart...');
     final baseDart = join(packageDir, 'lib', 'src', '${packageName}_base.dart');
     final content = '$fileHeader\n\n$baseDartSnippet\n';
     File(baseDart).writeAsStringSync(content);
@@ -389,6 +416,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _fixErrorsAndWarnings() {
+    log('Fix errors and warnings...');
     // Execute dart fix
     final result = Process.runSync(
       'dart',
@@ -420,6 +448,7 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _initGit() {
+    log('Init git...');
     // Execute git init
     final result = Process.runSync(
       'git',
@@ -485,23 +514,47 @@ class _CreateDartPackage {
 
     // Push repo to GitHub
     if (prepareGitHub) {
+      final gitHubOrigin = 'git@github.com:inlavigo/$packageName.git';
+
       final result6 = Process.runSync(
         'git',
-        ['remote', 'add', 'origin', 'git@github.com:inlavigo/$packageName.git'],
+        ['remote', 'add', 'origin', gitHubOrigin],
         workingDirectory: packageDir,
       );
 
       if (result6.exitCode != 0) {
         // coverage:ignore-start
         throw Exception(
-          'Error while running "git@github.com:inlavigo/$packageName.git"',
+          'Error add GitHub origin "$gitHubOrigin" ',
         );
         // coverage:ignore-end
       }
 
-      log?.call('Everything is prepared.');
-      log?.call('Please call "cd $packageDir" and \n');
-      log?.call('call "git push -u origin main" to push to GitHub.');
+      // Execute git push -u origin main --dry-run
+
+      final result7 = Process.runSync(
+        'git',
+        ['push', '-u', 'origin', 'main', '--dry-run'],
+        workingDirectory: packageDir,
+      );
+
+      if (result7.exitCode != 0) {
+        // coverage:ignore-start
+        throw Exception(
+          'Error while running "git push -u origin main --dry-run". \n '
+          '${result7.stderr}',
+        );
+        // coverage:ignore-end
+      }
+    }
+
+    log('\nSuccess! To open the project with visual studio code, call ');
+    log('${greenStart}code $packageDir$greenEnd\n');
+
+    if (prepareGitHub) {
+      log('To push the project to GitHub, call');
+      log('${greenStart}git push -u origin main$greenEnd\n');
+      log('Happy coding!');
     }
   }
 }
