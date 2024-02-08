@@ -10,8 +10,11 @@ import 'package:path/path.dart';
 
 /// Get the project directory
 String audCliDirectory() {
+  // If we run github action we are using $GITHUB_WORKSPACE as the root
+  final gitHubWorkSpace = Platform.environment['GITHUB_WORKSPACE'];
+
   // Get the current working directory
-  final current = Directory.current.path;
+  final current = gitHubWorkSpace ?? Directory.current.path;
 
   // Does the current working directory contain an "aud_cli" directory?
   final isAudCliDir = current.contains('aud_cli');

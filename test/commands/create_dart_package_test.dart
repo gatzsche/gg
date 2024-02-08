@@ -187,7 +187,10 @@ void main() {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
 
-      // Expect does not throw exception
+      // Create the package directory
+      tempPackageDir.createSync();
+
+      // Expect does not throw exception because --force is given
       await r.run([
         'createDartPackage',
         '-o',
@@ -197,6 +200,7 @@ void main() {
         '-d',
         description,
         '--prepare-github',
+        '--force',
       ]);
 
       // The package should exist
