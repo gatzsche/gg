@@ -8,14 +8,19 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:aud/src/commands/create_dart_package.dart';
-import 'package:aud/src/licenses/open_source_licence.dart';
-import 'package:aud/src/licenses/private_license.dart';
+import 'package:aud/src/snippets/base_dart.dart';
+import 'package:aud/src/snippets/file_header.dart';
+import 'package:aud/src/snippets/open_source_licence.dart';
+import 'package:aud/src/snippets/private_license.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final Directory tempDir = Directory.systemTemp;
+  final tempDir = Directory('/Users/gatzsche/tmp'); // Directory.systemTemp;
   final logMessages = <String>[];
+  const String description = 'This is a description of the package. '
+      'It should be at least 60 characters long.';
+
   void log(String message) {
     logMessages.add(message);
   }
@@ -23,6 +28,15 @@ void main() {
   // ...........................................................................
   setUp(() {
     logMessages.clear();
+    final audTestDir = Directory(join(tempDir.path, 'aud_test'));
+    if (audTestDir.existsSync()) {
+      audTestDir.deleteSync(recursive: true);
+    }
+
+    final ggTestDir = Directory(join(tempDir.path, 'gg_test'));
+    if (ggTestDir.existsSync()) {
+      ggTestDir.deleteSync(recursive: true);
+    }
   });
 
   // ...........................................................................
@@ -44,6 +58,8 @@ void main() {
           'some unknown directory',
           '-n',
           'aud_test',
+          '-d',
+          description,
         ]),
         throwsA(
           isA<Exception>().having(
@@ -56,14 +72,32 @@ void main() {
     });
 
     // #########################################################################
+    test('should throw when description is less then 60 characters', () {
+      // Expect throws exception
+      expectLater(
+        r.run([
+          'createDartPackage',
+          '-o',
+          tempDir.path,
+          '-n',
+          'aud_test',
+          '-d',
+          'This description is less then 60 chars.',
+        ]),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            'Exception: The description must be at least 60 characters long.',
+          ),
+        ),
+      );
+    });
+
+    // #########################################################################
     test('should throw when the package directory already exists', () {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
-
-      // delete the package directory
-      if (tempPackageDir.existsSync()) {
-        tempPackageDir.deleteSync(recursive: true);
-      }
 
       // Create the package directory
       tempPackageDir.createSync();
@@ -76,6 +110,8 @@ void main() {
           tempDir.path,
           '-n',
           'aud_test',
+          '-d',
+          description,
         ]),
         throwsA(
           isA<Exception>().having(
@@ -86,9 +122,6 @@ void main() {
           ),
         ),
       );
-
-      // Delete the temporary directory
-      tempPackageDir.deleteSync(recursive: true);
     });
 
     // #########################################################################
@@ -104,6 +137,8 @@ void main() {
           '-n',
           'xyz_test',
           '--no-open-source',
+          '-d',
+          description,
         ]),
         throwsA(
           isA<Exception>().having(
@@ -128,6 +163,8 @@ void main() {
           '-n',
           'xyz_test',
           '--open-source',
+          '-d',
+          description,
         ]),
         throwsA(
           isA<Exception>().having(
@@ -144,11 +181,6 @@ void main() {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'aud_test'));
 
-      // delete the package directory
-      if (tempPackageDir.existsSync()) {
-        tempPackageDir.deleteSync(recursive: true);
-      }
-
       // Expect does not throw exception
       await r.run([
         'createDartPackage',
@@ -156,6 +188,8 @@ void main() {
         tempDir.path,
         '-n',
         'aud_test',
+        '-d',
+        description,
       ]);
 
       // The package should exist
@@ -230,22 +264,64 @@ void main() {
 
       // .................................
       // Package should contain the checks
-      expect(File(join(tempPackageDir.path, 'check')).existsSync(), true);
+      final checkFiles = [
+        'check',
+        'check.yaml',
+        'check_pana.dart',
+        'check.dart',
+        'check_coverage.dart',
+      ];
 
-      // ..............................
-      // Delete the temporary directory
-      tempPackageDir.deleteSync(recursive: true);
+      for (final checkFile in checkFiles) {
+        expect(File(join(tempPackageDir.path, checkFile)).existsSync(), true);
+      }
+
+      // ...............................
+      // Github actions should be copied
+      final gitHubAction =
+          File(join(tempPackageDir.path, '.github/workflows/check.yaml'));
+      expect(gitHubAction.existsSync(), isTrue);
+
+      // ..........................
+      // Should update pubspec.yaml
+
+      // Write repository
+      final pubspec =
+          File(join(tempPackageDir.path, 'pubspec.yaml')).readAsStringSync();
+      final pattern = RegExp(
+        r'^repository: https://github.com/inlavigo/aud_test$',
+        multiLine: true,
+      );
+      expect(pubspec.contains(pattern), isTrue);
+
+      // ....................
+      // Should update README
+      final readme =
+          File(join(tempPackageDir.path, 'README.md')).readAsStringSync();
+
+      expect(
+          readme,
+          '# aud_test\n\nThis is a description of the package. '
+          'It should be at least 60 characters long.\n');
+
+      // ......................
+      // Should init change log
+      final changeLog =
+          File(join(tempPackageDir.path, 'CHANGELOG.md')).readAsStringSync();
+      expect(changeLog, '# Change Log\n\n## 1.0.0\n\n- Initial version.\n');
+
+      // Should add comment to aud_test_base.dart
+      final audTestBase =
+          File(join(tempPackageDir.path, 'lib', 'src', 'aud_test_base.dart'))
+              .readAsStringSync();
+      expect(audTestBase, contains(fileHeader));
+      expect(audTestBase, contains(baseDartSnippet));
     });
 
     // #########################################################################
     test('should create open source dart package', () async {
       // Create a temporary directory
       final tempPackageDir = Directory(join(tempDir.path, 'gg_test'));
-
-      // delete the package directory
-      if (tempPackageDir.existsSync()) {
-        tempPackageDir.deleteSync(recursive: true);
-      }
 
       // Expect does not throw exception
       await r.run([
@@ -255,6 +331,8 @@ void main() {
         '-n',
         'gg_test',
         '--open-source',
+        '-d',
+        description,
       ]);
 
       // The package should exist
@@ -267,9 +345,6 @@ void main() {
         File(join(tempPackageDir.path, 'LICENSE')).readAsStringSync(),
         openSourceLicense,
       );
-
-      // Delete the temporary directory
-      tempPackageDir.deleteSync(recursive: true);
     });
   });
 }
