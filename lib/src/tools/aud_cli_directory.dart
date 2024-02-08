@@ -10,17 +10,14 @@ import 'package:path/path.dart';
 
 /// Get the project directory
 String audCliDirectory() {
-  // If we run github action we are using $GITHUB_WORKSPACE as the root
-  final gitHubWorkSpace = Platform.environment['GITHUB_WORKSPACE'];
-
   // Get the current working directory
-  final current = gitHubWorkSpace ?? Directory.current.path;
-
-  // Does the current working directory contain an "aud_cli" directory?
-  final isAudCliDir = current.contains('aud_cli');
+  final current = Directory.current.path;
 
   // Is the current working directory in the checkout dir?
   final isCheckOutDir = Directory(join(current, 'aud_cli')).existsSync();
+
+  // Does the current working directory contain an "aud_cli" directory?
+  final isAudCliDir = !isCheckOutDir && current.contains('aud_cli');
 
   // We need to be either within the aud_cli directory or in the checkout dir
   if (!isAudCliDir && !isCheckOutDir) {
@@ -30,7 +27,7 @@ String audCliDirectory() {
 
   // Estimate the project root
   final projectRoot = isAudCliDir
-      ? current.substring(0, current.indexOf('aud_cli') + 7)
+      ? current.substring(0, current.lastIndexOf('aud_cli') + 7)
       : join(current, 'aud_cli');
 
   return projectRoot;

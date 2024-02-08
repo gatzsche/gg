@@ -31,25 +31,25 @@ void main() {
         Directory.current = Directory.current.parent;
         expect(audCliDirectory(), endsWith('aud_cli'));
       });
+    });
 
-      test(
-          'should throw when the current working dir '
-          'is not checkout dir or aud_cli dir', () {
-        // Change the current working dir to the grandparent dir of aud_cli
-        Directory.current = Directory.current.parent.parent;
-        expect(
-          () => audCliDirectory(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              'Exception: The current directory needs to be '
-                  'either a subdirectory or the direct parent directory '
-                  'of aud_cli.',
-            ),
+    test(
+        'should throw when the current working dir '
+        'is not checkout dir or aud_cli dir', () {
+      // Change the current working dir to the grandparent dir of aud_cli
+      Directory.current = Directory.systemTemp;
+      expect(
+        () => audCliDirectory(),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            'Exception: The current directory needs to be '
+                'either a subdirectory or the direct parent directory '
+                'of aud_cli.',
           ),
-        );
-      });
+        ),
+      );
     });
   });
 }

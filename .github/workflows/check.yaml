@@ -48,11 +48,8 @@ jobs:
       - name: Install lcov
         run: sudo apt-get install lcov
 
-      - name: Test
-        run: dart test
-
       - name: Make Script Executable
         run: chmod +x ./check.dart
 
       - name: Run Script
-        run: ./check.dart
+        run: ./check.dart --verbose

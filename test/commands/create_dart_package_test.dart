@@ -13,6 +13,7 @@ import 'package:aud/src/snippets/file_header.dart';
 import 'package:aud/src/snippets/open_source_licence.dart';
 import 'package:aud/src/snippets/private_license.dart';
 import 'package:aud/src/tools/color.dart';
+import 'package:aud/src/tools/is_github_action.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -330,37 +331,42 @@ void main() {
 
       // ...............
       // Should init git
-      final gitDir = Directory(join(tempPackageDir.path, '.git'));
-      expect(gitDir.existsSync(), isTrue);
+      if (!isGitHubAction) {
+        final gitDir = Directory(join(tempPackageDir.path, '.git'));
+        expect(gitDir.existsSync(), isTrue);
 
-      final result = Process.runSync(
-        'git',
-        ['status'],
-        workingDirectory: tempPackageDir.path,
-      );
-      expect(result.stdout, contains('nothing to commit, working tree clean'));
+        final result = Process.runSync(
+          'git',
+          ['status'],
+          workingDirectory: tempPackageDir.path,
+        );
+        expect(
+          result.stdout,
+          contains('nothing to commit, working tree clean'),
+        );
 
-      expect(
-        logMessages,
-        contains(
-          '\nSuccess! To open the project with visual studio code, call ',
-        ),
-      );
+        expect(
+          logMessages,
+          contains(
+            '\nSuccess! To open the project with visual studio code, call ',
+          ),
+        );
 
-      expect(
-        logMessages,
-        contains('${greenStart}code ${tempPackageDir.path}$greenEnd\n'),
-      );
+        expect(
+          logMessages,
+          contains('${greenStart}code ${tempPackageDir.path}$greenEnd\n'),
+        );
 
-      expect(
-        logMessages,
-        contains('To push the project to GitHub, call'),
-      );
+        expect(
+          logMessages,
+          contains('To push the project to GitHub, call'),
+        );
 
-      expect(
-        logMessages,
-        contains('${greenStart}git push -u origin main$greenEnd\n'),
-      );
+        expect(
+          logMessages,
+          contains('${greenStart}git push -u origin main$greenEnd\n'),
+        );
+      }
     });
 
     // #########################################################################

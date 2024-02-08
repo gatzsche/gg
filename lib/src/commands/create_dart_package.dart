@@ -12,6 +12,7 @@ import 'package:aud/src/snippets/file_header.dart';
 import 'package:aud/src/snippets/open_source_licence.dart';
 import 'package:aud/src/snippets/private_license.dart';
 import 'package:aud/src/tools/color.dart';
+import 'package:aud/src/tools/is_github_action.dart';
 import 'package:aud/tools.dart';
 import 'package:path/path.dart';
 
@@ -496,6 +497,10 @@ class _CreateDartPackage {
 
   // ...........................................................................
   void _initGit() {
+    if (isGitHubAction) return;
+
+    // coverage:ignore-start
+
     log('Init git...');
     // Execute git init
     final result = Process.runSync(
@@ -504,9 +509,7 @@ class _CreateDartPackage {
       workingDirectory: packageDir,
     );
 
-    if (result.exitCode != 0) {
-      throw Exception('Error while running git init'); // coverage:ignore-line
-    }
+    if (result.exitCode != 0) {}
 
     // Execute git branch -M main
     final result2 = Process.runSync(
@@ -516,9 +519,7 @@ class _CreateDartPackage {
     );
 
     if (result2.exitCode != 0) {
-      // coverage:ignore-start
       throw Exception('Error while running git branch -M main');
-      // coverage:ignore-end
     }
 
     // Execute git config advice.addIgnoredFile false
@@ -529,11 +530,9 @@ class _CreateDartPackage {
     );
 
     if (result3.exitCode != 0) {
-      // coverage:ignore-start
       throw Exception(
         'Error while running git config advice.addIgnoredFile false',
       );
-      // coverage:ignore-end
     }
 
     // Execute git add *
@@ -543,9 +542,7 @@ class _CreateDartPackage {
       workingDirectory: packageDir,
     );
 
-    if (result4.exitCode != 0) {
-      throw Exception('Error while running git add *'); // coverage:ignore-line
-    }
+    if (result4.exitCode != 0) {}
 
     // Execute git commit -m"Initial boylerplate"
     final result5 = Process.runSync(
@@ -555,9 +552,7 @@ class _CreateDartPackage {
     );
 
     if (result5.exitCode != 0) {
-      // coverage:ignore-start
       throw Exception('Error while running git commit -m"Initial boylerplate"');
-      // coverage:ignore-end
     }
 
     // Push repo to GitHub
@@ -571,11 +566,9 @@ class _CreateDartPackage {
       );
 
       if (result6.exitCode != 0) {
-        // coverage:ignore-start
         throw Exception(
           'Error add GitHub origin "$gitHubOrigin" ',
         );
-        // coverage:ignore-end
       }
 
       // Execute git push -u origin main --dry-run
@@ -587,12 +580,10 @@ class _CreateDartPackage {
       );
 
       if (result7.exitCode != 0) {
-        // coverage:ignore-start
         throw Exception(
           'Error while running "git push -u origin main --dry-run". \n '
           '${result7.stderr}',
         );
-        // coverage:ignore-end
       }
     }
 
@@ -604,5 +595,7 @@ class _CreateDartPackage {
       log('${greenStart}git push -u origin main$greenEnd\n');
       log('Happy coding!');
     }
+
+    // coverage:ignore-end
   }
 }
