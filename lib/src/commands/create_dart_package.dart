@@ -337,7 +337,7 @@ class _CreateDartPackage {
     // Copy over file
     final checkFiles = files
         .where(
-          (item) => relative(item, from: audCliDirectory()).startsWith('check'),
+          (item) => item.startsWith('check'),
         )
         .toList();
 
