@@ -5,21 +5,9 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:args/command_runner.dart';
-import 'package:aud_cli/commands.dart';
-import 'package:aud_cli/tools.dart';
+import 'package:aud_cli/src/aud_cli.dart';
 
 // #############################################################################
 Future<void> main(List<String> arguments) async {
-  try {
-    final r = CommandRunner<dynamic>(
-      'aud',
-      'Our cli to manage many tasks about audanika software development.',
-    )..addCommand(CreateDartPackage(log: (msg) => print(msg)));
-
-    await r.run(arguments);
-  } catch (e) {
-    final msg = e.toString().replaceAll('Exception: ', '');
-    print('$redStart$msg$redEnd');
-  }
+  await audCli(arguments: arguments, log: print);
 }
