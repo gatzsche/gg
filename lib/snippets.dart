@@ -6,7 +6,7 @@
 
 library;
 
-export 'src/tools/aud_cli_directory.dart';
-export 'src/tools/checkout_directory.dart';
-export 'src/tools/is_github_action.dart';
-export 'src/tools/color.dart';
+export 'src/snippets/base_dart.dart';
+export 'src/snippets/file_header.dart';
+export 'src/snippets/open_source_licence.dart';
+export 'src/snippets/private_license.dart';

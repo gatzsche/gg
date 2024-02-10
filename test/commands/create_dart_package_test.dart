@@ -7,13 +7,9 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:aud/src/commands/create_dart_package.dart';
-import 'package:aud/src/snippets/base_dart.dart';
-import 'package:aud/src/snippets/file_header.dart';
-import 'package:aud/src/snippets/open_source_licence.dart';
-import 'package:aud/src/snippets/private_license.dart';
-import 'package:aud/src/tools/color.dart';
-import 'package:aud/src/tools/is_github_action.dart';
+import 'package:aud_cli/src/commands/create_dart_package.dart';
+import 'package:aud_cli/snippets.dart';
+import 'package:aud_cli/tools.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 

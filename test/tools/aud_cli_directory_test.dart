@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:aud/tools.dart';
+import 'package:aud_cli/tools.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -6,8 +6,8 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:aud/commands.dart';
-import 'package:aud/src/tools/color.dart';
+import 'package:aud_cli/commands.dart';
+import 'package:aud_cli/tools.dart';
 
 // #############################################################################
 Future<void> main(List<String> arguments) async {

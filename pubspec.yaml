@@ -1,4 +1,4 @@
-name: aud
+name: aud_cli
 description: The audanika developer command line
 version: 1.0.0
 repository: https://github.com/inlavigo/aud

@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:aud/tools.dart';
+import 'package:aud_cli/tools.dart';
 
 /// Returns the directory the checkouts need to be done
 String checkoutDirectory() {

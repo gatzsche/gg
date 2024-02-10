@@ -6,8 +6,7 @@
 
 import 'dart:io';
 
-import 'package:aud/src/tools/checkout_directory.dart';
-import 'package:aud/tools.dart';
+import 'package:aud_cli/tools.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
