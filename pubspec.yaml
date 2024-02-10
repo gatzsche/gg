@@ -12,6 +12,8 @@ dependencies:
   args: ^2.4.2
   aud_cli_create_dart_package:
     git: git@github.com:inlavigo/aud_cli_create_dart_package.git
+  aud_cli_gc:
+    git: git@github.com:inlavigo/aud_cli_gc.git
   colorize: ^3.0.0
 
 dev_dependencies:

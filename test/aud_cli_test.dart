@@ -10,10 +10,10 @@ import 'package:aud_cli/src/aud_cli.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final expectedCommands = ['createDartPackage', 'help'];
-  final messages = <String>[];
+  final expectedCommands = ['createDartPackage', 'gc', 'help'];
 
   // ...........................................................................
+  final messages = <String>[];
   final zoneSpecification = ZoneSpecification(
     print: (_, __, ___, String msg) {
       messages.add(msg);
@@ -48,7 +48,7 @@ void main() {
     });
 
     // #########################################################################
-    test('createDartPackage', () async {
+    test('should contain all expected commands', () async {
       await exec([]);
       for (final command in expectedCommands) {
         expect(messages.last, contains(command));
