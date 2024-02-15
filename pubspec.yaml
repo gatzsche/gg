@@ -14,6 +14,8 @@ dependencies:
     git: git@github.com:inlavigo/aud_cli_create_dart_package.git
   aud_cli_gc:
     git: git@github.com:inlavigo/aud_cli_gc.git
+  gg_check:
+    git: git@github.com:inlavigo/gg_check.git
   colorize: ^3.0.0
 
 dev_dependencies:
