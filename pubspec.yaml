@@ -10,8 +10,8 @@ environment:
 dependencies:
   path: ^1.8.0
   args: ^2.4.2
-  aud_cli_create_dart_package:
-    git: git@github.com:inlavigo/aud_cli_create_dart_package.git
+  gg_cli_cp:
+    git: git@github.com:inlavigo/gg_cli_cp.git
   aud_cli_gc:
     git: git@github.com:inlavigo/aud_cli_gc.git
   gg_check:

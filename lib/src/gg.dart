@@ -6,10 +6,10 @@
 // found in the LICENSE file in the root of this package.
 
 import 'package:args/command_runner.dart';
-import 'package:aud_cli_create_dart_package/create_dart_package.dart';
 import 'package:aud_cli_gc/aud_cli_gc.dart';
 import 'package:colorize/colorize.dart';
 import 'package:gg_check/gg_check.dart';
+import 'package:gg_cli_cp/create_dart_package.dart';
 
 // #############################################################################
 /// Creates the Audanika developer command line
@@ -22,7 +22,7 @@ Future<void> gg({
       'aud',
       'Our cli to manage many tasks about audanika software development.',
     )
-      ..addCommand(CreateDartPackage(log: log))
+      ..addCommand(CreatePackage(log: log))
       ..addCommand(GenerateCode(log: log))
       ..addCommand(GgCheck(log: log));
 
