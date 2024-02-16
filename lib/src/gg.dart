@@ -13,7 +13,7 @@ import 'package:gg_check/gg_check.dart';
 
 // #############################################################################
 /// Creates the Audanika developer command line
-Future<void> audCli({
+Future<void> gg({
   required List<String> arguments,
   required void Function(Object msg) log,
 }) async {

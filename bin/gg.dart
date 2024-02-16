@@ -5,9 +5,9 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import 'package:aud_cli/src/aud_cli.dart';
+import 'package:gg/src/gg.dart';
 
 // #############################################################################
 Future<void> main(List<String> arguments) async {
-  await audCli(arguments: arguments, log: print);
+  await gg(arguments: arguments, log: print);
 }

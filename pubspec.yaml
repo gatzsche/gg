@@ -1,7 +1,7 @@
-name: aud_cli
-description: The audanika developer command line
+name: gg
+description: The developer command line for maintaining all of our repos
 version: 1.0.0
-repository: https://github.com/inlavigo/aud_cli
+repository: https://github.com/inlavigo/gg
 publish_to: none
 
 environment:

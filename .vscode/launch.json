@@ -9,7 +9,7 @@
       "name": "Run aud",
       "type": "dart",
       "request": "launch",
-      "program": "aud_cli/bin/aud.dart",
+      "program": "gg_cli/bin/aud.dart",
       "args": [
         "createDartPackage",
         "-n",

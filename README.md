@@ -1,3 +1,3 @@
-# Aud
+# GG
 
-The audanika developer command line
+The developer command line for maintaining all of our gg packages

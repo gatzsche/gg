@@ -6,7 +6,7 @@
 
 import 'dart:async';
 
-import 'package:aud_cli/src/aud_cli.dart';
+import 'package:gg/src/gg.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -30,7 +30,7 @@ void main() {
     // Capture the print output
     Zone.current.fork(specification: zoneSpecification).run(() async {
       // Run the command
-      await audCli(
+      await gg(
         arguments: args,
         log: print,
       );
