@@ -15,8 +15,8 @@ import 'package:colorize/colorize.dart';
 
 // #############################################################################
 void main() {
-  const exe = 'aud';
-  const src = 'bin/aud.dart';
+  const exe = 'gg';
+  const src = 'bin/gg.dart';
   final installDir = '${Platform.environment['HOME']}/.pub-cache/bin';
 
   // Create install dir if it does not exist

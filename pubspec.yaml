@@ -16,6 +16,8 @@ dependencies:
     git: git@github.com:inlavigo/gg_cli_cc.git
   gg_check:
     git: git@github.com:inlavigo/gg_check.git
+  gg_kidney:
+    git: git@github.com:inlavigo/gg_kidney.git
   colorize: ^3.0.0
 
 dev_dependencies:

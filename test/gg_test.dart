@@ -10,7 +10,7 @@ import 'package:gg/src/gg.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final expectedCommands = ['cp', 'cc', 'help'];
+  final expectedCommands = ['cp', 'cc', 'kidney', 'help'];
 
   // ...........................................................................
   final messages = <String>[];

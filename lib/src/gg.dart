@@ -10,6 +10,7 @@ import 'package:colorize/colorize.dart';
 import 'package:gg_check/gg_check.dart';
 import 'package:gg_cli_cc/gg_cli_cc.dart';
 import 'package:gg_cli_cp/create_dart_package.dart';
+import 'package:gg_kidney/gg_kidney.dart';
 
 // #############################################################################
 /// Creates the Audanika developer command line
@@ -19,12 +20,13 @@ Future<void> gg({
 }) async {
   try {
     final r = CommandRunner<dynamic>(
-      'aud',
+      'gg',
       'Our cli to manage many tasks about audanika software development.',
     )
       ..addCommand(CreatePackage(log: log))
       ..addCommand(GenerateCode(log: log))
-      ..addCommand(GgCheck(log: log));
+      ..addCommand(GgCheck(log: log))
+      ..addCommand(GgKidney(log: log));
 
     await r.run(arguments);
   } catch (e) {
