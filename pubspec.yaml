@@ -12,8 +12,8 @@ dependencies:
   args: ^2.4.2
   gg_cli_cp:
     git: git@github.com:inlavigo/gg_cli_cp.git
-  aud_cli_gc:
-    git: git@github.com:inlavigo/aud_cli_gc.git
+  gg_cli_cc:
+    git: git@github.com:inlavigo/gg_cli_cc.git
   gg_check:
     git: git@github.com:inlavigo/gg_check.git
   colorize: ^3.0.0
